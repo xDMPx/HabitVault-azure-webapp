@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.5/.schema/devbox.schema.json",
+  "packages": {
+    "nodejs":      "21.7.3",
+    "openssl_3_2": "3.2.1",
+    "nodePackages.node-gyp": "latest"
+  },
+  "env": {
+    "DEVBOX_COREPACK_ENABLED": "true"
+  },
+  "shell": {
+    "init_hook": [
+      "echo 'Welcome to devbox!' > /dev/null"
+    ],
+    "scripts": {
+      "test": [
+        "echo \"Error: no test specified\" && exit 1"
+      ],
+      "init": [
+        "cd HabitVault-backend",
+        "npm install",
+        "PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x npx prisma generate",
+        "PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x npx prisma migrate dev --name init",
+        "cd ../HabitVault",
+        "npm install"
+      ],
+      "start-backend": [
+        "cd HabitVault-backend",
+        "PRISMA_QUERY_ENGINE_LIBRARY='node_modules/@prisma/engines/libquery_engine-debian-openssl-3.0.x.so.node' npm run devstart"
+      ],
+      "start-frontend": [
+        "cd HabitVault",
+        "npm run dev"
+      ],
+      "start-db": [
+        "docker compose up"
+      ]
+    }
+  }
+}

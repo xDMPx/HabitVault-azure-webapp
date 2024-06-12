@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    username String        @id
+    password String
+    admin    Boolean       @default(false)
+    habits   Habit[]
+    records  HabitRecord[]
+}
+
+model Habit {
+    id          String        @id @default(uuid())
+    name        String
+    description String
+    User        User          @relation(fields: [userId], references: [username], onDelete: Cascade)
+    userId      String
+    records     HabitRecord[]
+}
+
+model HabitRecord {
+    id      String   @id @default(uuid())
+    date    DateTime
+    habitId String
+    Habit   Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+    User    User     @relation(fields: [userId], references: [username], onDelete: Cascade)
+    userId  String
+}
