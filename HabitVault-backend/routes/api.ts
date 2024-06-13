@@ -5,6 +5,7 @@ import * as argon2 from "argon2"
 import { restrict, adminRestrict } from '../middlewares'
 import { TypedRequest, RegisterBody, LoginBody } from '../interfaces'
 import { isValidUserName } from '../utils'
+import { redis } from '../app'
 
 const router = Router()
 const prisma = new PrismaClient()
@@ -52,6 +53,13 @@ router.post('/register', async (req: TypedRequest<RegisterBody>, res: Response, 
             })
             return
         }
+        else if (await redis.get(`banned:${username}`) === "1") {
+            res.status(400).json({
+                error: "Banned Username"
+            })
+            return
+        }
+
 
         const passhash = await argon2.hash(password)
         const user = await prisma.user.create({
@@ -67,12 +75,16 @@ router.post('/register', async (req: TypedRequest<RegisterBody>, res: Response, 
     }
 })
 
-
 router.post('/login', async (req: TypedRequest<LoginBody>, res: Response, next: NextFunction) => {
     try {
         const username = req.body.username
         const password = req.body.password
         if (username !== undefined && isValidUserName(username) && password !== undefined) {
+            const banned = (await redis.get(`banned:${username}`) === "1")
+            if (banned) {
+                res.status(401).json({ error: "Account have been baned" })
+                return
+            }
             const user = await prisma.user.findFirst({
                 where: {
                     username: username,
