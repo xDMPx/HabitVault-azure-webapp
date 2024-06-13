@@ -4,7 +4,7 @@ import * as argon2 from "argon2"
 
 import { restrict, adminRestrict } from '../middlewares'
 import { TypedRequest, RegisterBody, LoginBody } from '../interfaces'
-import { isValidUserName } from '../utils'
+import { isValidUserName, isValidPassword } from '../utils'
 import { redis } from '../app'
 
 const router = Router()
@@ -52,6 +52,11 @@ router.post('/register', async (req: TypedRequest<RegisterBody>, res: Response, 
                 error: "Invalid Username"
             })
             return
+        } else if (!isValidPassword(password)) {
+            res.status(400).json({
+                error: "Invalid Password"
+            })
+            return
         }
         else if (await redis.get(`banned:${username}`) === "1") {
             res.status(400).json({
@@ -79,7 +84,7 @@ router.post('/login', async (req: TypedRequest<LoginBody>, res: Response, next: 
     try {
         const username = req.body.username
         const password = req.body.password
-        if (username !== undefined && isValidUserName(username) && password !== undefined) {
+        if (username !== undefined && isValidUserName(username) && password !== undefined && isValidPassword(password)) {
             const banned = (await redis.get(`banned:${username}`) === "1")
             if (banned) {
                 res.status(401).json({ error: "Account have been baned" })
