@@ -28,6 +28,7 @@ export async function restrict(req: Request, res: Response, next: NextFunction) 
         } else {
             res.status(401).json()
         }
+
     } catch (err) {
         next(err)
     }

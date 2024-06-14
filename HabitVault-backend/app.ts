@@ -8,6 +8,15 @@ import dotenv from "dotenv"
 import { log } from './middlewares'
 
 dotenv.config()
+export const sessionSecret = process.env.SESSION_SECRET ?? ""
+if (sessionSecret === "") {
+    throw "Define SESSION_SECRET in .env"
+}
+export const crosOrigin = process.env.CROS_ORIGIN ?? ""
+if (sessionSecret === "") {
+    throw "Define CROS_ORIGIN in .env"
+}
+
 
 export const redis = new Redis()
 export const redisStore = new RedisStore({
@@ -19,7 +28,7 @@ app.use(session({
     store: redisStore,
     resave: false, // required: force lightweight session keep alive (touch)
     saveUninitialized: false, // recommended: only save session when data exists
-    secret: 'testSecret',
+    secret: sessionSecret,
     name: "session",
     cookie: {
         maxAge: 31536000000,
@@ -29,7 +38,7 @@ app.use(session({
 }))
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: crosOrigin,
     credentials: true,
 }))
 app.use(log)
