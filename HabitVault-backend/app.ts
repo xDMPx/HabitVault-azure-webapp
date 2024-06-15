@@ -13,12 +13,17 @@ if (sessionSecret === "") {
     throw "Define SESSION_SECRET in .env"
 }
 export const crosOrigin = process.env.CROS_ORIGIN ?? ""
-if (sessionSecret === "") {
+if (crosOrigin === "") {
     throw "Define CROS_ORIGIN in .env"
 }
+export const redisURL = process.env.REDIS_URL ?? ""
+if (redisURL === "") {
+    throw "Define REDIS_URL in .env"
+}
 
-
-export const redis = new Redis()
+console.log(process.env.REDIS_URL)
+console.log(process.env.DATABASE_URL)
+const redis = new Redis(process.env.REDIS_URL || "", { tls: true as any })
 export const redisStore = new RedisStore({
     client: redis,
 })
@@ -36,13 +41,13 @@ app.use(session({
         sameSite: 'lax'
     }
 }))
-
 app.use(cors({
     origin: crosOrigin,
     credentials: true,
 }))
 app.use(log)
 
+app.use(express.static('dist'))
 app.use('/api/', require('./routes/api'))
 app.use('/api/admin', require('./routes/api/admin'))
 app.use('/api/user', require('./routes/api/user'))
