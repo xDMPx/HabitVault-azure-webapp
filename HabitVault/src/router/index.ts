@@ -2,8 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import axios from 'axios'
 
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL
-
+axios.defaults.baseURL = "https://habitvault.azurewebsites.net/api/"
 
 export const enum UserType {
     Unknown,

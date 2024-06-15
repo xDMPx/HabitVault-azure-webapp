@@ -4,6 +4,7 @@ import RedisStore from "connect-redis"
 import Redis from "ioredis"
 import cors from 'cors'
 import dotenv from "dotenv"
+import { spawn } from "node:child_process"
 
 import { log } from './middlewares'
 
@@ -21,9 +22,14 @@ if (redisURL === "") {
     throw "Define REDIS_URL in .env"
 }
 
+const command = spawn('npx', ["prisma", "migrate", "deploy"])
+command.stdout.on('data', output => {
+    console.log("Output: ", output.toString())
+})
+
 console.log(process.env.REDIS_URL)
 console.log(process.env.DATABASE_URL)
-const redis = new Redis(process.env.REDIS_URL || "", { tls: true as any })
+export const redis = new Redis(process.env.REDIS_URL || "", { tls: true as any })
 export const redisStore = new RedisStore({
     client: redis,
 })
@@ -52,9 +58,6 @@ app.use('/api/', require('./routes/api'))
 app.use('/api/admin', require('./routes/api/admin'))
 app.use('/api/user', require('./routes/api/user'))
 app.use('/api/user/habits', require('./routes/api/user/habits'))
-app.use((_req: Request, res: Response, _next: NextFunction) => {
-    res.destroy()
-})
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(`${req.ip} ${req.method} ${req.url} => ERROR\n${err}`)
