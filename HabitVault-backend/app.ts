@@ -5,6 +5,7 @@ import Redis from "ioredis"
 import cors from 'cors'
 import dotenv from "dotenv"
 import { spawn } from "node:child_process"
+import history = require("connect-history-api-fallback")
 
 import { log } from './middlewares'
 
@@ -51,6 +52,7 @@ app.use(cors({
     origin: crosOrigin,
     credentials: true,
 }))
+app.use(history())
 app.use(log)
 
 app.use(express.static('dist'))
