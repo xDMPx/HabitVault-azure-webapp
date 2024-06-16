@@ -46,8 +46,13 @@ export async function adminRestrict(req: Request, res: Response, next: NextFunct
         }).catch((err) => next(err))
 
         if (admin?.admin) {
-            res.locals.username = req.session.username
-            next()
+            const banned = (await redis.get(`banned:${req.session.username}`) === "1")
+            if (banned) {
+                res.status(401).json()
+            } else {
+                res.locals.username = req.session.username
+                next()
+            }
         } else {
             res.status(401).json()
         }
