@@ -32,10 +32,11 @@ function handleFormSubmit() {
         alertText.value = ["Invalid habit name",
             "Length between 3 to 20 characters.",
             "Must start with a capital letter.",
-            "Can contain letters, numbers, periods,commas and |, /, \, _, -"]
+            "Can contain letters, numbers, periods, commas and '|', '/', '\\', '_', '-'."]
         return
     }
     else if (formData.value.description.length > 140) {
+        showAlert.value = true
         alertText.value = ["Habit description too long"]
         return
     }
