@@ -52,6 +52,7 @@ app.use(cors({
     origin: crosOrigin,
     credentials: true,
 }))
+// @ts-ignore
 app.use(history())
 app.use(log)
 
