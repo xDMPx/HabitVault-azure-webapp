@@ -22,6 +22,11 @@ export const redisURL = process.env.REDIS_URL ?? ""
 if (redisURL === "") {
     throw "Define REDIS_URL in .env"
 }
+npm install 
+const command = spawn('npm', ["install", "@prisma/client"])
+command.stdout.on('data', output => {
+    console.log("Output: ", output.toString())
+})
 
 const command = spawn('npx', ["prisma", "migrate", "deploy"])
 command.stdout.on('data', output => {
